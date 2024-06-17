@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,18 @@ use App\Http\Controllers\AdminController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
+
+//require __DIR__.'/auth.php';
 
 Route::get('/halo', function () {
     return "Hallo semua";
@@ -76,15 +89,17 @@ Route::get('/mahasiswa/all-join-elq',[MahasiswaController::class,'allJoinElq']);
  Route::get('login',[AuthController::class,'index'])->name('login');
  Route::post('proses_login',[AuthController::class,'proses_login'])->name('proses_login');
  Route::get('logout',[AuthController::class,'logout'])->name('logout');
- Route::get('register',[AuthController::class,'register']);
- Route::post('proses_register',[AuthController::class,'proses_register'])->name('proses_register');
 
+ Route::get("register", [AuthController::class, 'register'])->name('register');
+Route::post("proses_register", [AuthController::class, 'proses_register'])->name('proses_register');
 
- Route::group(['middleware'=> 'auth'], function () {
-    Route::group(['middleware'=> 'cek_login:admin'], function () {
-        Route::resource('admin',AdminController::class);
-});
-Route::group(['middleware'=> 'cek_login:user'], function () {
-    Route::resource('user',UserController::class);
-});
+// gunakan midleware group auth
+Route::group(['middleware' => 'auth'], function(){
+    Route::group(['middleware' => 'cek_login:admin'], function(){
+        Route::resource('admin', AdminController::class);
+    });
+
+    Route::group(['middleware' => 'cek_login:user'], function(){
+        Route::resource('user', UserController::class);
+    });
 });
